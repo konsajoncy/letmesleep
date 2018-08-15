@@ -1,0 +1,14 @@
+.project
+.cproject
+de.innot.avreclipse.core.prefs
+inzynierka.eep
+inzynierka.hex
+inzynierka.lss
+inzynierka.map
+makefile
+objects.mk
+sources.mk
+subdir.mk
+main.o
+main.d
+inzynierka.elf
