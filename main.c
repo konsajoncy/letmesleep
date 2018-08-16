@@ -358,8 +358,3 @@ void TIMER0_init(void)
 	OCR0 = 155;
 }
 
-
-void TIMER1_init(void)
-{
-
-}
