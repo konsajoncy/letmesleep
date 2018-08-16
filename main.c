@@ -77,12 +77,22 @@ struct key_st
 */
 //volatile uint8_t n=0;
 
-enum tryb {energy_save, losowanie, nadawanie, interakcja };
+typedef enum e_tryb
+{
+	energy_save,
+	losowanie,
+	nadawanie,
+	interakcja,
+} tryb;
 
 volatile uint8_t rnd_tab[los_liczb];
+volatile uint8_t usr_ans[(los_liczb)*2];
+
 volatile uint8_t  stan=nadawanie;
 
 volatile uint8_t debug_val=0;
+
+volatile uint8_t * ptr_usr_ans = &usr_ans[0];
 
 void PutToSerial(unsigned char data);
 void StrToSerial(char *msg);
@@ -135,7 +145,7 @@ static uint16_t keycnt=0;
 static uint8_t keylev=0;
 static uint8_t keyr=0;
 
-	if(keycnt==0)
+if(keycnt==0)
 	{
 		switch(keylev)
 		{
@@ -150,10 +160,14 @@ static uint8_t keyr=0;
 		case 1:	 // button was pressed, debouncing start
 			if(keyh == keyr)
 			{
-				//PORTA^=(1<<PA7);
+				keycnt = 200;
 				debug_val ++;
-				PutIntToSerial(debug_val);
-				keylev=2;
+				if(keyh==1)
+				{
+					(*ptr_usr_ans) = debug_val;
+					ptr_usr_ans ++;
+					keylev=2;
+				}
 			}
 			break;
 		case 2:
@@ -169,6 +183,41 @@ static uint8_t keyr=0;
 if(keycnt>0)
 	keycnt--;
 
+// imagine that ;/
+
+// thats fine to debug, but we need time when pressed
+/*
+	if(keycnt==0)
+	{
+		switch(keylev)
+		{
+		case 0:     // waiting for press
+			if(keyh!=1)
+			{
+				keyr=keyh;
+				keylev=1;
+				keycnt=200;
+			}
+			break;
+		case 1:	 // button was pressed, debouncing start
+			if(keyh == keyr)
+			{
+				keylev=2;
+			}
+			break;
+		case 2:
+			if(keyh==1)
+				{
+				keylev=0;
+				}
+			break;
+		}
+	}
+
+
+if(keycnt>0)
+	keycnt--;
+*/
 }
 
 
@@ -200,9 +249,9 @@ ISR(TIMER0_COMP_vect)
 
 		if(rnd_cnt>= rnd_tab[tab_ind])
 		{
-			StrToSerial("[");
-			PutIntToSerial(rnd_tab[tab_ind]);
-			StrToSerial("]");
+			//StrToSerial("[");
+			//PutIntToSerial(rnd_tab[tab_ind]);
+			//StrToSerial("]");
 			tab_ind++;
 			rnd_cnt=0;
 		}
@@ -211,7 +260,7 @@ ISR(TIMER0_COMP_vect)
 		{
 			tab_ind = 0;
 			PORT_sim^=(1<<LED_deb);
-			StrToSerial("\r");
+			//StrToSerial("\r");
 
 		}
 
